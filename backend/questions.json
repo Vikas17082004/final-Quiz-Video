@@ -1,0 +1,112 @@
+[
+  {
+    "question": "1. भारत का राष्ट्रीय पशु कौन सा है?",
+    "options": [
+      "शेर",
+      "हाथी",
+      "बाघ",
+      "तेंदुआ"
+    ],
+    "correct": 2,
+    "imageQuery": "Bengal tiger India"
+  },
+  {
+    "question": "2. संविधान सभा द्वारा भारतीय संविधान कब अपनाया गया था?",
+    "options": [
+      "26 जनवरी 1950",
+      "15 अगस्त 1947",
+      "26 नवंबर 1949",
+      "2 अक्टूबर 1949"
+    ],
+    "correct": 2,
+    "imageQuery": "Indian Constitution adoption"
+  },
+  {
+    "question": "3. मानव शरीर में सबसे बड़ी ग्रंथि कौन सी है?",
+    "options": [
+      "थायरॉइड",
+      "पिट्यूटरी",
+      "लिवर",
+      "पैंक्रियास"
+    ],
+    "correct": 2,
+    "imageQuery": "human liver diagram"
+  },
+  {
+    "question": "4. ‘काली मिट्टी’ मुख्य रूप से किस फसल के लिए उपयुक्त है?",
+    "options": [
+      "गेहूं",
+      "चावल",
+      "कपास",
+      "मक्का"
+    ],
+    "correct": 2,
+    "imageQuery": "black soil cotton field"
+  },
+  {
+    "question": "5. सूर्य का सबसे बाहरी वायुमंडलीय परत क्या कहलाती है?",
+    "options": [
+      "प्रकाशमंडल",
+      "वर्णमंडल",
+      "कोरोना",
+      "केंद्रक"
+    ],
+    "correct": 2,
+    "imageQuery": "sun corona layer"
+  },
+  {
+    "question": "6. ‘जय जवान जय किसान’ का नारा किसने दिया था?",
+    "options": [
+      "महात्मा गांधी",
+      "जवाहरलाल नेहरू",
+      "लाल बहादुर शास्त्री",
+      "सुभाष चंद्र बोस"
+    ],
+    "correct": 2,
+    "imageQuery": "Lal Bahadur Shastri slogan"
+  },
+  {
+    "question": "7. विश्व पर्यावरण दिवस कब मनाया जाता है?",
+    "options": [
+      "22 अप्रैल",
+      "5 जून",
+      "16 सितंबर",
+      "2 अक्टूबर"
+    ],
+    "correct": 1,
+    "imageQuery": "World Environment Day poster"
+  },
+  {
+    "question": "8. मानव हृदय में कुल कितने कक्ष होते हैं?",
+    "options": [
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "correct": 2,
+    "imageQuery": "human heart chambers diagram"
+  },
+  {
+    "question": "9. भारत की सबसे लंबी नदी कौन सी है?",
+    "options": [
+      "यमुना",
+      "ब्रह्मपुत्र",
+      "गंगा",
+      "गोदावरी"
+    ],
+    "correct": 2,
+    "imageQuery": "Ganga river map"
+  },
+  {
+    "question": "10. ‘UNO’ का मुख्यालय कहाँ स्थित है?",
+    "options": [
+      "लंदन",
+      "पेरिस",
+      "जिनेवा",
+      "न्यूयॉर्क"
+    ],
+    "correct": 3,
+    "imageQuery": "United Nations headquarters New York"
+  }
+]
