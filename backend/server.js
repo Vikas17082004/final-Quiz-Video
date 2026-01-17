@@ -11,14 +11,14 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 
-/* ================= PATHS ================= */
+/* ================= ABSOLUTE PATHS ================= */
+const ROOT_DIR = path.resolve(__dirname, "..");
+const FRONTEND_DIR = path.join(ROOT_DIR, "frontend");
 const QUESTIONS_FILE = path.join(__dirname, "questions.json");
-const FRONTEND_PATH = path.join(__dirname, "../frontend");
 
 /* ================= MIDDLEWARE ================= */
 app.use(cors());
 app.use(express.json());
-app.use(express.static(FRONTEND_PATH));
 
 /* ================= FILE HELPERS ================= */
 function readQuestions() {
@@ -36,15 +36,9 @@ function saveQuestions(data) {
 async function getPexelsImage(query) {
   try {
     const res = await axios.get("https://api.pexels.com/v1/search", {
-      headers: {
-        Authorization: PEXELS_API_KEY
-      },
-      params: {
-        query,
-        per_page: 1
-      }
+      headers: { Authorization: PEXELS_API_KEY },
+      params: { query, per_page: 1 }
     });
-
     return res.data.photos?.[0]?.src?.large || "";
   } catch (err) {
     console.error("Pexels error:", err.message);
@@ -108,24 +102,28 @@ app.delete("/api/admin/delete-all", (req, res) => {
   res.json({ message: "All deleted" });
 });
 
-/* ================= FRONTEND ROUTES ================= */
+/* ================= FRONTEND ROUTES (EXPLICIT) ================= */
 app.get("/", (req, res) => {
-  res.sendFile(path.join(FRONTEND_PATH, "index.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "index.html"));
 });
 
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(FRONTEND_PATH, "admin.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "admin.html"));
 });
 
 app.get("/short", (req, res) => {
-  res.sendFile(path.join(FRONTEND_PATH, "short.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "short.html"));
 });
 
 app.get("/thumbnail", (req, res) => {
-  res.sendFile(path.join(FRONTEND_PATH, "thumbnail.html"));
+  res.sendFile(path.join(FRONTEND_DIR, "thumbnail.html"));
 });
+
+/* ================= STATIC ASSETS (CSS/JS/MP3) ================= */
+app.use("/assets", express.static(FRONTEND_DIR));
 
 /* ================= START SERVER ================= */
 app.listen(PORT, () => {
   console.log("✅ Server running on port " + PORT);
+  console.log("📁 Frontend directory:", FRONTEND_DIR);
 });
