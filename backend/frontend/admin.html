@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel – GK Quiz</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+  --saffron:#ff9933;
+  --white:#ffffff;
+  --green:#138808;
+  --navy:#000080;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  min-height:100vh;
+  background:radial-gradient(circle at top,
+  #ffedd5 0%,
+  #ffffff 45%,
+  #dcfce7 100%);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Poppins,sans-serif;
+}
+.admin-box{
+  width:95%;
+  max-width:800px;
+  background:#fff;
+  padding:30px;
+  border-radius:24px;
+  box-shadow:0 30px 60px rgba(0,0,0,.15);
+}
+h1,h2{
+  text-align:center;
+  margin-bottom:20px;
+  color:#7f1d1d;
+}
+label{
+  font-weight:600;
+  margin-top:14px;
+  display:block;
+}
+input,textarea,select,button{
+  width:100%;
+  margin-top:6px;
+  padding:12px;
+  border-radius:12px;
+  border:2px solid #e5e7eb;
+  font-size:15px;
+}
+textarea{resize:none}
+button{
+  margin-top:20px;
+  background:linear-gradient(135deg,var(--green),#0f6d06);
+
+  color:#fff;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+  border:none;
+}
+button:hover{opacity:.9}
+.success{margin-top:15px;color:#16a34a;font-weight:700;text-align:center}
+.error{margin-top:15px;color:#dc2626;font-weight:700;text-align:center}
+hr{margin:35px 0;border:none;height:2px;background:#e5e7eb}
+.question-item{
+  padding:14px;
+  border:2px solid #e5e7eb;
+  border-radius:12px;
+  margin-top:12px;
+}
+.edit-btn{
+  margin-top:8px;
+ background:var(--navy);
+
+  color:#fff;
+  border:none;
+  padding:6px 14px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+}
+</style>
+</head>
+
+<body>
+
+<div class="admin-box">
+
+<h1>🛠 GK Quiz – Admin Panel</h1>
+
+<!-- ================= BULK UPLOAD ================= -->
+
+<h2>📦 Bulk Upload (Up to 10 Questions)</h2>
+
+<textarea id="bulkText" rows="14" placeholder="
+Question?
+A) Option A
+B) Option B
+C) Option C
+D) Option D
+Answer: C
+Image: search keyword
+
+(Leave ONE blank line between questions)
+"></textarea>
+
+<button onclick="bulkAdd()">📤 Upload Bulk Questions</button>
+<div id="bulkMsg"></div>
+
+<hr>
+
+<!-- ================= DELETE ALL ================= -->
+
+<button style="background:#b91c1c" onclick="deleteAllQuestions()">
+🧹 Delete ALL Questions
+</button>
+<div id="deleteAllMsg"></div>
+
+<hr>
+<!-- ================= BACKGROUND MUSIC ================= -->
+
+<h2>🎵 Upload Background Music</h2>
+
+<label>Select Music File (MP3)</label>
+<input type="file" id="bgMusicFile" accept="audio/*">
+
+<button onclick="uploadBgMusic()">⬆ Upload Background Music</button>
+<div id="musicMsg"></div>
+
+<hr>
+
+
+<!-- ================= EDIT QUESTIONS ================= -->
+
+<h2>✏️ Edit Questions</h2>
+<div id="questionList"></div>
+
+<hr>
+
+
+
+<!-- ================= SINGLE QUESTION (BOTTOM) ================= -->
+
+<h2>Update Question</h2>
+
+<label>Question</label>
+<textarea id="question" rows="3"></textarea>
+
+<label>Option A</label>
+<input id="opt0">
+
+<label>Option B</label>
+<input id="opt1">
+
+<label>Option C</label>
+<input id="opt2">
+
+<label>Option D</label>
+<input id="opt3">
+
+<label>Correct Answer</label>
+<select id="correct">
+  <option value="0">Option A</option>
+  <option value="1">Option B</option>
+  <option value="2">Option C</option>
+  <option value="3">Option D</option>
+</select>
+
+<label>Image Search Keyword (Pexels)</label>
+<input id="imageQuery" placeholder="e.g. Iskander missile Russia">
+
+<button onclick="addQuestion()"> Update  Question</button>
+<div id="msg"></div>
+
+</div>
+
+<script>
+let editIndex=null;
+
+/* SINGLE ADD / UPDATE */
+function addQuestion(){
+  const question=document.getElementById("question").value.trim();
+  const options=[opt0.value.trim(),opt1.value.trim(),opt2.value.trim(),opt3.value.trim()];
+  const correct=parseInt(correctEl.value||document.getElementById("correct").value);
+  const imageQuery=document.getElementById("imageQuery").value.trim();
+  const msg=document.getElementById("msg");
+
+  if(!question||options.some(o=>!o)||!imageQuery){
+    msg.innerHTML='<div class="error">❌ Please fill all fields</div>';
+    return;
+  }
+
+  fetch(editIndex===null?"/api/admin/add":"/api/admin/edit/"+editIndex,{
+    method:editIndex===null?"POST":"PUT",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({question,options,correct,imageQuery})
+  }).then(r=>r.json()).then(()=>{
+    msg.innerHTML='<div class="success">✅ Saved</div>';
+    document.querySelectorAll("input,textarea").forEach(e=>e.value="");
+    editIndex=null;
+    loadQuestions();
+  });
+}
+
+/* BULK ADD */
+function bulkAdd(){
+  fetch("/api/admin/bulk-add",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({text:bulkText.value})
+  }).then(r=>r.json()).then(()=>{
+    bulkMsg.innerHTML='<div class="success">✅ Bulk Upload Successful</div>';
+    bulkText.value="";
+    loadQuestions();
+  });
+}
+
+/* LOAD QUESTIONS */
+function loadQuestions(){
+  fetch("/api/admin/questions").then(r=>r.json()).then(data=>{
+    questionList.innerHTML="";
+    data.forEach((q,i)=>{
+      const d=document.createElement("div");
+      d.className="question-item";
+      d.innerHTML=`<b>${i+1}. ${q.question}</b><br>
+      <button class="edit-btn" onclick="editQuestion(${i})">Edit</button>`;
+      questionList.appendChild(d);
+    });
+  });
+}
+
+/* EDIT */
+function editQuestion(i){
+  fetch("/api/admin/questions").then(r=>r.json()).then(d=>{
+    const q=d[i];
+    editIndex=i;
+    question.value=q.question;
+    opt0.value=q.options[0];
+    opt1.value=q.options[1];
+    opt2.value=q.options[2];
+    opt3.value=q.options[3];
+    correct.value=q.correct;
+    imageQuery.value=q.imageQuery;
+    window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"});
+  });
+}
+
+/* DELETE ALL */
+function deleteAllQuestions(){
+  if(!confirm("Delete ALL questions?"))return;
+  fetch("/api/admin/delete-all",{method:"DELETE"})
+  .then(r=>r.json())
+  .then(()=>{deleteAllMsg.innerHTML='<div class="success">✅ Deleted</div>';loadQuestions();});
+}
+
+/* UPLOAD MUSIC */
+function uploadBgMusic(){
+  if(!bgMusicFile.files.length)return;
+  const fd=new FormData();
+  fd.append("music",bgMusicFile.files[0]);
+  fetch("/api/admin/upload-bgmusic",{method:"POST",body:fd})
+  .then(()=>musicMsg.innerHTML='<div class="success">✅ Music Updated</div>');
+}
+
+loadQuestions();
+</script>
+
+</body>
+</html>

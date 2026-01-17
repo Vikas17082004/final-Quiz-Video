@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium GK Quiz – YouTube Edition</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Poppins:wght@700;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --saffron: #ff9933;
+  --white: #ffffff;
+  --green: #138808;
+  --navy: #000080;
+  --yellow-light: #fde68a;
+  --yellow-dark: #facc15;
+  --shadow-color: rgba(0, 0, 0, 0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at top, #ffedd5 0%, #ffffff 45%, #dcfce7 100%);
+  font-family: "Tiro Devanagari Hindi", serif;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== MAIN WRAPPER ===== */
+.quiz-wrapper {
+  width: 95%;
+  max-width: 1200px;
+  height: 92vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  position: relative;
+  box-shadow: 0 50px 100px rgba(0,0,0,0.2);
+  border-radius: 30px;
+  border: 1px solid var(--white);
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+.quiz-header {
+  padding: 30px 40px;
+  background: linear-gradient(135deg, var(--saffron), #e65100);
+  display: flex;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.question-box {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 22px 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 38px;
+  font-weight: 900;
+  color: #1f2937;
+  width: 100%;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+  opacity: 0;
+  transform: translateY(-30px);
+}
+.question-box.show { animation: slideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+.q-number {
+  min-width: 70px;
+  height: 70px;
+  border-radius: 18px;
+  background: var(--navy);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  font-family: Poppins;
+  box-shadow: 0 6px 0px #00004d;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  padding: 30px 40px;
+  flex-grow: 1;
+  align-items: center;
+}
+
+/* ===== OPTIONS ===== */
+.options { display: flex; flex-direction: column; gap: 22px; }
+
+.option-btn {
+  position: relative;
+  padding: 20px 25px 20px 85px;
+  font-size: 32px;
+  font-weight: 900;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--yellow-light), var(--yellow-dark));
+  color: #1f2937;
+  box-shadow: 0 8px 0 #ca8a04;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-60px);
+  text-align: left;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.option-btn::before {
+  content: attr(data-label);
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Poppins;
+  font-size: 26px;
+}
+
+.option-btn.show { animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+.option-btn.correct {
+  background: linear-gradient(135deg, #22c55e, var(--green)) !important;
+  color: var(--white) !important;
+  box-shadow: 0 8px 0 #0f6d06, 0 0 30px rgba(34, 197, 94, 0.5);
+  transform: scale(1.05) translateX(10px);
+}
+
+/* ===== MEDIA & TIMER ===== */
+.media-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-square {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1/1;
+  border-radius: 25px;
+  padding: 10px;
+  background: var(--white);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+  display: none;
+  overflow: hidden;
+}
+.image-square.show { display: block; animation: zoomIn 0.5s ease; }
+.image-square img { width: 100%; height: 100%; object-fit: cover; border-radius: 15px; }
+
+.timer-box {
+  width: 240px;
+  height: 240px;
+  position: relative;
+  display: none;
+  background: var(--white);
+  border-radius: 50%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+.timer-box.show { display: block; }
+.timer-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.timer-bg { fill: none; stroke: #f3f4f6; stroke-width: 10; }
+.timer-progress {
+  fill: none; stroke: #dc2626; stroke-width: 10;
+  stroke-dasharray: 327; stroke-dashoffset: 0;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.1s linear;
+}
+.timer-text {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 100px; font-family: Poppins; font-weight: 900; color: #dc2626;
+}
+
+/* ===== OVERLAYS ===== */
+.overlay {
+  position: absolute; inset: 0; background: var(--white);
+  z-index: 100; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  padding: 40px;
+}
+.hidden { display: none; }
+
+.btn-primary {
+  padding: 18px 50px;
+  font-size: 28px;
+  font-weight: 900;
+  border: none;
+  border-radius: 100px;
+  background: linear-gradient(135deg, var(--green), #0a4d04);
+  color: var(--white);
+  cursor: pointer;
+  box-shadow: 0 8px 0 #073602;
+  transition: all 0.2s;
+}
+.btn-primary:active { transform: translateY(4px); box-shadow: 0 4px 0 #073602; }
+
+.short-btn {
+  background: linear-gradient(135deg, #ff0057, #ff7a00) !important;
+  box-shadow: 0 8px 0 #9f0036 !important;
+  animation: pulseGlow 2s infinite;
+}
+
+/* ===== INTRO/END REFINEMENT ===== */
+.intro-badge {
+  padding: 12px 35px;
+  border-radius: 100px;
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--white);
+  background: linear-gradient(135deg, #ff0057, #ff7a00);
+  box-shadow: 0 0 30px rgba(255, 80, 0, 0.5);
+  margin-bottom: 25px;
+}
+
+.intro-text {
+  font-size: 52px;
+  font-weight: 900;
+  color: #7f1d1d;
+  line-height: 1.3;
+}
+
+/* ===== FLOATING EMOJIS ===== */
+.floating {
+  position: absolute; font-size: 70px;
+  animation: floatObj 6s infinite ease-in-out;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+}
+.f1 { top: 10%; left: 8%; animation-delay: 0s; }
+.f2 { top: 15%; right: 10%; animation-delay: 1s; }
+.f3 { bottom: 15%; left: 12%; animation-delay: 2s; }
+.f4 { bottom: 10%; right: 15%; animation-delay: 3s; }
+
+/* ANIMATIONS */
+@keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+@keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes floatObj { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-30px); } }
+@keyframes pulseGlow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+/* ===== CINEMATIC INTRO ===== */
+.intro-title {
+  font-size: 68px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg,#ff9933,#ffffff,#138808);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: titleReveal 1.2s ease-out forwards;
+}
+
+@keyframes titleReveal {
+  from { opacity: 0; transform: scale(0.8) translateY(30px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: gold;
+  border-radius: 50%;
+  animation: sparkleMove 4s infinite linear;
+  opacity: 0.8;
+}
+
+@keyframes sparkleMove {
+  from { transform: translateY(0) scale(0.5); opacity: 0; }
+  50% { opacity: 1; }
+  to { transform: translateY(-600px) scale(1.2); opacity: 0; }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="quiz-wrapper">
+
+  <div id="startOverlay" class="overlay">
+    <h1 style="font-size:60px; color:#e65100; margin-bottom:10px">सामान्य ज्ञान क्विज़</h1>
+    <div style="display:flex; flex-direction:column; gap:25px; width: 400px;">
+
+  <button id="startBtn" class="btn-primary">
+    ▶ Quiz Start
+  </button>
+
+  <button class="btn-primary short-btn"
+    onclick="location.href='short.html'">
+    🎬 YT Short Mode
+  </button>
+
+  <!-- ✅ NEW THUMBNAIL BUTTON -->
+  <button class="btn-primary"
+    style="
+      background:linear-gradient(135deg,#2563eb,#1e40af);
+      font-size:22px;
+      box-shadow:0 8px 0 #1e3a8a
+    "
+    onclick="location.href='thumbnail.html'">
+    🖼 Create Thumbnail
+  </button>
+
+  <button class="btn-primary"
+    style="background:#334155; font-size:20px; box-shadow: 0 8px 0 #1e293b;"
+    onclick="location.href='admin.html'">
+    ⚙ Edit Questions
+  </button>
+
+</div>
+
+  </div>
+
+  <div id="introOverlay" class="overlay hidden">
+
+  <!-- sparkles -->
+  <div class="sparkle" style="left:20%"></div>
+  <div class="sparkle" style="left:40%"></div>
+  <div class="sparkle" style="left:60%"></div>
+  <div class="sparkle" style="left:80%"></div>
+
+  <!-- floating emojis (already present) -->
+  <div class="floating f1">🎉</div>
+  <div class="floating f2">📚</div>
+  <div class="floating f3">❓</div>
+  <div class="floating f4">🔥</div>
+
+  <div class="intro-wrapper">
+    <div class="intro-title">GK QUIZ • हिंदी</div>
+    <div id="introText" class="intro-text"></div>
+  </div>
+
+</div>
+
+
+  <div id="endOverlay" class="overlay hidden">
+    <div class="floating f1">🙏</div><div class="floating f2">👍</div>
+    <div class="floating f3">🔔</div><div class="floating f4">❤️</div>
+    <div class="intro-badge">धन्यवाद</div>
+    <div class="intro-text">
+      Like 👍 Share 🔁<br>Subscribe 🔔 जरूर करें
+    </div>
+  </div>
+
+  <header class="quiz-header">
+    <div id="questionContainer" class="question-box">
+      <div id="qNumber" class="q-number">1</div>
+      <div id="questionText">लोड हो रहा है...</div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div id="options" class="options"></div>
+    <div class="media-container">
+      <div id="timerBox" class="timer-box">
+        <svg class="timer-svg" viewBox="0 0 120 120">
+          <circle class="timer-bg" cx="60" cy="60" r="52"/>
+          <circle class="timer-progress" cx="60" cy="60" r="52"/>
+        </svg>
+        <div id="timerText" class="timer-text">5</div>
+      </div>
+      <div id="imageBox" class="image-square">
+        <img id="displayImg">
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+const bgMusic=new Audio("/bg-music.mp3");
+bgMusic.loop=true;bgMusic.volume=.01;
+const timerSound=new Audio("/timer.mp3");
+let quizEnded = false;
+
+let quizData=[],dataReady=false,index=0,bgStarted=false;
+const FULL_DASH=327;
+const VOICE_RATE = 1.1; 
+
+const qText=document.getElementById("questionText");
+const qNum=document.getElementById("qNumber");
+const qContainer=document.getElementById("questionContainer");
+const optionsBox=document.getElementById("options");
+const timerBox=document.getElementById("timerBox");
+const timerText=document.getElementById("timerText");
+const progressCircle=document.querySelector(".timer-progress");
+const imageBox=document.getElementById("imageBox");
+const displayImg=document.getElementById("displayImg");
+
+fetch("/api/quiz").then(r=>r.json()).then(d=>{
+  quizData=d; dataReady=true;
+});
+
+function speak(text,cb){
+  speechSynthesis.cancel();
+  if(!bgStarted && !quizEnded){
+    bgMusic.play().catch(()=>{});
+    bgStarted = true;
+  }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "hi-IN";
+  u.rate = VOICE_RATE;
+  u.onend = () => cb && cb();
+  speechSynthesis.speak(u);
+}
+
+function speakWithType(text,done){
+  const el=document.getElementById("introText");
+  el.textContent="";
+  let i=0;
+  function type(){
+    if(i<text.length){
+      el.textContent+=text[i++];
+      setTimeout(type,45);
+    }
+  }
+  type();
+  speak(text,done);
+}
+
+function showIntro(){
+  const intro=document.getElementById("introOverlay");
+  intro.classList.remove("hidden");
+  const lines=[
+    "नमस्कार दोस्तों,",
+    "आज के इस वीडियो में हम आपके लिए लेकर आए हैं",
+    "बहुत ही मज़ेदार सामान्य ज्ञान के सवाल।",
+    "वीडियो को अंत तक जरूर देखिए।",
+    "तो चलिए क्विज़ शुरू करते हैं।"
+  ];
+  let i=0;
+  function next(){
+    if(i>=lines.length){
+      setTimeout(()=>{
+        intro.classList.add("hidden");
+        loadQuestion();
+      },800);
+      return;
+    }
+    speakWithType(lines[i],()=>{
+      setTimeout(()=>{
+        document.getElementById("introText").textContent="";
+        i++;
+        next();
+      },150);
+    });
+  }
+  next();
+}
+
+function loadQuestion(){
+  const q=quizData[index];
+  optionsBox.innerHTML="";
+  imageBox.classList.remove("show");
+  qContainer.classList.remove("show");
+  void qContainer.offsetWidth;
+  qContainer.classList.add("show");
+
+  qNum.textContent=index+1;
+  qText.textContent=q.question;
+
+  ["A","B","C","D"].forEach((l,i)=>{
+    const b=document.createElement("button");
+    b.className="option-btn";
+    b.dataset.label=l;
+    b.textContent=q.options[i];
+    optionsBox.appendChild(b);
+  });
+
+  speak(index===0?"आपका पहला सवाल है":"अगला सवाल",()=>{
+    speak(q.question,()=>speakOptions(q.options,startTimer));
+  });
+}
+
+function speakOptions(options,done){
+  const btns=document.querySelectorAll(".option-btn");
+  let i=0;
+  function next(){
+    if(i>=options.length){done&&done();return;}
+    btns[i].classList.add("show");
+    speak("Option "+String.fromCharCode(65+i)+" "+options[i],()=>{
+      i++; next();
+    });
+  }
+  next();
+}
+
+function startTimer(){
+  let timeLeft=5;
+  timerBox.classList.add("show");
+  timerText.textContent=5;
+  progressCircle.style.strokeDashoffset=0;
+  timerSound.currentTime=0;
+  timerSound.play().catch(()=>{});
+
+  const t=setInterval(()=>{
+    timeLeft-=0.1;
+    if(timeLeft<=0){
+      clearInterval(t);
+      timerSound.pause();
+      timerText.textContent="0";
+      progressCircle.style.strokeDashoffset=FULL_DASH;
+      setTimeout(showAnswer,1000);
+    }else{
+      timerText.textContent=Math.ceil(timeLeft);
+      progressCircle.style.strokeDashoffset=FULL_DASH-(timeLeft/5)*FULL_DASH;
+    }
+  },100);
+}
+
+function showAnswer(){
+  const q = quizData[index];
+  timerBox.classList.remove("show");
+
+  const btns = document.querySelectorAll(".option-btn");
+  btns[q.correct].classList.add("correct");
+
+  displayImg.src = q.answerImage;
+  imageBox.classList.add("show");
+
+  const optionLetter = String.fromCharCode(65 + q.correct);
+  const optionText = q.options[q.correct];
+
+  speak(
+    "सही जवाब है Option " + optionLetter + " " + optionText,
+    () => {
+      setTimeout(() => {
+        index++;
+        if(index < quizData.length){
+          loadQuestion();
+        } else {
+          document.getElementById("endOverlay").classList.remove("hidden");
+          speak(
+            "दोस्तों अगर वीडियो पसंद आया हो तो लाइक शेयर और सब्सक्राइब जरूर करें धन्यवाद"
+          );
+          quizEnded = true;
+        }
+      }, 2500);
+    }
+  );
+}
+
+document.getElementById("startBtn").onclick=()=>{
+  if(!dataReady) return alert("लोड हो रहा है...");
+  document.getElementById("startOverlay").classList.add("hidden");
+  showIntro();
+};
+</script>
+
+</body>
+</html> 
