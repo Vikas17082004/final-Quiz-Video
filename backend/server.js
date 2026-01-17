@@ -2,22 +2,23 @@ const express = require("express");
 const path = require("path");
 const axios = require("axios");
 const fs = require("fs");
-require("dotenv").config(); // ✅ LOAD ENV VARIABLES
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 
-/* ✅ Railway compatible PORT */
+/* ================= CONFIG ================= */
 const PORT = process.env.PORT || 5000;
-
-/* 🔑 SECURED API KEY */
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 
-/* 📁 File path */
+/* ================= PATHS ================= */
 const QUESTIONS_FILE = path.join(__dirname, "questions.json");
+const FRONTEND_PATH = path.join(__dirname, "../frontend");
 
 /* ================= MIDDLEWARE ================= */
+app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../frontend")));
+app.use(express.static(FRONTEND_PATH));
 
 /* ================= FILE HELPERS ================= */
 function readQuestions() {
@@ -35,11 +36,18 @@ function saveQuestions(data) {
 async function getPexelsImage(query) {
   try {
     const res = await axios.get("https://api.pexels.com/v1/search", {
-      headers: { Authorization: PEXELS_API_KEY },
-      params: { query, per_page: 1 }
+      headers: {
+        Authorization: PEXELS_API_KEY
+      },
+      params: {
+        query,
+        per_page: 1
+      }
     });
-    return res.data.photos?.[0]?.src.large || "";
-  } catch {
+
+    return res.data.photos?.[0]?.src?.large || "";
+  } catch (err) {
+    console.error("Pexels error:", err.message);
     return "";
   }
 }
@@ -72,6 +80,8 @@ app.post("/api/admin/bulk-add", (req, res) => {
 
   blocks.forEach(block => {
     const lines = block.split("\n");
+    if (lines.length < 7) return;
+
     questions.push({
       question: lines[0],
       options: [
@@ -100,11 +110,19 @@ app.delete("/api/admin/delete-all", (req, res) => {
 
 /* ================= FRONTEND ROUTES ================= */
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+  res.sendFile(path.join(FRONTEND_PATH, "index.html"));
 });
 
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/admin.html"));
+  res.sendFile(path.join(FRONTEND_PATH, "admin.html"));
+});
+
+app.get("/short", (req, res) => {
+  res.sendFile(path.join(FRONTEND_PATH, "short.html"));
+});
+
+app.get("/thumbnail", (req, res) => {
+  res.sendFile(path.join(FRONTEND_PATH, "thumbnail.html"));
 });
 
 /* ================= START SERVER ================= */
